@@ -39,7 +39,7 @@ public class PosteoController {
     public ResponseEntity<String> editPosteo(@PathVariable Long id, @RequestBody Posteo posteo) {
         try {
             posteoService.editPosteo(id, posteo);
-            return  ResponseEntity.ok("Persona actualizada con exito");
+            return  ResponseEntity.ok("Posteo actualizado con exito");
         } catch (RuntimeException e) {
             return  ResponseEntity.status(404).body(e.getMessage());
         }

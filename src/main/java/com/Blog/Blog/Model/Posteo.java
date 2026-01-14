@@ -1,8 +1,11 @@
 package com.Blog.Blog.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "posteos")
@@ -20,19 +23,36 @@ public class Posteo {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    private String autor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "autor_id", nullable = false)
+    @JsonIgnoreProperties("posteos")
+    private Author autor;
 
-    // Constructor vacío (Obligatorio para JPA)
-    public Posteo() {
-    }
+    @OneToMany(mappedBy = "posteo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("posteo")
+    private List<Comment> comentarios = new ArrayList<>();
 
-    public Posteo(Long idPosteo, String titulo, String contenido, LocalDateTime fechaCreacion, String autor) {
+
+    // Constructor
+    public Posteo() {}
+
+    public Posteo(Long idPosteo, String titulo, String contenido, LocalDateTime fechaCreacion, Author autor, List<Comment> comentarios) {
         this.idPosteo = idPosteo;
         this.titulo = titulo;
         this.contenido = contenido;
         this.fechaCreacion = fechaCreacion;
         this.autor = autor;
+        this.comentarios = comentarios;
     }
+
+    public List<Comment> getComentarios() {
+        return comentarios;
+    }
+
+    public void setComentarios(List<Comment> comentarios) {
+        this.comentarios = comentarios;
+    }
+
     //Automatizar creacion de fecha
     @PrePersist
     protected void onCreate() {
@@ -71,11 +91,12 @@ public class Posteo {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public String getAutor() {
+    //Changed
+    public Author getAutor() {
         return autor;
     }
 
-    public void setAutor(String autor) {
+    public void setAutor(Author autor) {
         this.autor = autor;
     }
 }
