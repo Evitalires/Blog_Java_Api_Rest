@@ -1,7 +1,9 @@
 package com.Blog.Blog.Service;
 
 import com.Blog.Blog.Model.Comment;
+import com.Blog.Blog.Model.Posteo;
 import com.Blog.Blog.Repository.IcommentRepository;
+import com.Blog.Blog.Repository.IposteoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +15,12 @@ import java.util.Optional;
 public class CommentService implements IserviceComment {
 
     private final IcommentRepository commentRepository;
+    private final IposteoRepository posteoRepository;
 
     @Autowired
-    public CommentService(IcommentRepository commentRepository) {
+    public CommentService(IcommentRepository commentRepository, IposteoRepository posteoRepository) {
         this.commentRepository = commentRepository;
+        this.posteoRepository = posteoRepository;
     }
 
     @Override
@@ -31,6 +35,11 @@ public class CommentService implements IserviceComment {
 
     @Override
     public Comment guardarComment(Comment comment) {
+        // Buscamos el posteo real por ID para asegurar la relación
+        Posteo posteoExistente = posteoRepository.findById(comment.getPosteo().getIdPosteo())
+                .orElseThrow(() -> new RuntimeException("El posteo ID " + comment.getPosteo().getIdPosteo() + " no existe"));
+
+        comment.setPosteo(posteoExistente);
         return commentRepository.save(comment);
     }
 
